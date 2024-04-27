@@ -1,9 +1,6 @@
 from __future__ import annotations
 
-from xhtml2pdf import pisa
-import pandas as pd
 from PySide2 import QtCore, QtGui
-from model import TableModel
 
 
 class StyleBuilder:
@@ -144,7 +141,7 @@ class Builder:
         """
         Add the page footer
         """
-        txt = f'<footer style="text-align: right;">{footer}</footer>'
+        txt = f'<footer style="text-align: left;">{footer}</footer>'
         self.footer = txt
 
     def get_html(self) -> str:
@@ -154,16 +151,19 @@ class Builder:
         Returns:
             ready-to-use html string
         """
-        txt = ('<!DOCTYPE html>'
-               '<html>'
-               '<head>'
-               '<style>'
-               'table {border-collapse: collapse; width: 100%;}'
-               'th {background-color: #ddd; padding: 10px; text-align: left; border: 1px solid #ccc;}'
-               'td {padding: 10px; border: 1px solid #ccc;}'
-               '</style>'
-               '</head>'
-               '<body style="padding: 25px;">')
+
+        txt = """
+       <!DOCTYPE html>
+       <html>
+       <head>
+       <style>
+           table {border-collapse: collapse; width: 40%;}
+           th {background-color: #ddd; padding: 10px; text-align: left; border: 1px solid #ccc;}
+           td {border: 1px solid #ccc;}
+       </style>
+       </head>
+       <body style=padding: 25px;>
+        """""
 
         if self.header:
             txt += self.header
@@ -177,22 +177,3 @@ class Builder:
                 "</html>")
 
         return txt
-
-    def get_pdf(self, output_filename):
-        result_file = open(output_filename, "w+b")
-
-        pisa_status = pisa.CreatePDF(
-            self.get_html(),
-            dest=result_file)
-
-        result_file.close()
-
-        return pisa_status.err
-
-builder = Builder(TableModel(pd.read_csv("demo_data.csv")))
-builder.add_header("Sample Report for demo data")
-builder.add_footer("Author: Yuvneesh")
-
-builder.get_pdf("sample.pdf")
-
-
