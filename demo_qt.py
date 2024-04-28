@@ -4,10 +4,8 @@ import sys
 
 import pandas as pd
 from PySide2 import QtWidgets
-from PySide2.QtCore import QMarginsF
-from PySide2.QtGui import QPageLayout, QPageSize
 from PySide2.QtUiTools import QUiLoader
-from PySide2.QtWebEngineWidgets import QWebEnginePage
+
 
 from builder import Builder
 from model import TableModel
@@ -21,33 +19,17 @@ window = loader.load(r"demo_ui.ui", None)
 table = window.tableView.setModel(data_model)
 
 
-def send_print_request():
+def print_pdf():
     """
-    Prepares the table view for printing
+    Prints the table view
     """
     builder = Builder(data_model)
     builder.add_header("Demo PDF Report")
     builder.add_footer("Generated from PyQT TableView")
-    html = builder.get_html()
-    doc = QWebEnginePage()
-
-    def print_pdf():
-        """
-        Prints the pdf
-        """
-        filename = "sample.pdf"
-
-        layout = QPageLayout(QPageSize(QPageSize.A4),
-                             QPageLayout.Portrait,
-                             QMarginsF())
-
-        doc.printToPdf(filename, layout)
-
-    doc.loadFinished.connect(print_pdf)
-    doc.setHtml(html)
+    builder.print_pdf("demo_report.pdf")
 
 
-window.button_print.clicked.connect(lambda: send_print_request())
+window.button_print.clicked.connect(lambda: print_pdf())
 
 window.show()
 app.exec_()

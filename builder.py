@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 from PySide2 import QtCore, QtGui
+from PySide2.QtCore import QMarginsF
+from PySide2.QtGui import QPageLayout, QPageSize
+from PySide2.QtWebEngineWidgets import QWebEnginePage
 
 
 class StyleBuilder:
@@ -177,3 +180,19 @@ class Builder:
                 "</html>")
 
         return txt
+
+    def print_pdf(self, filename):
+        """
+        Prepares the pdf from the data_model's html and prints it
+        """
+        doc = QWebEnginePage()
+
+        def _print():
+            """
+            Prints the pdf
+            """
+            layout = QPageLayout(QPageSize(QPageSize.Legal), QPageLayout.Landscape, QMarginsF())
+            doc.printToPdf(filename, layout)
+
+        doc.loadFinished.connect(_print)
+        doc.setHtml(self.get_html())
